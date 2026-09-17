@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Turn ambient light on -->
+    <capability android:name="actions.intent.TURN_ON">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.akshatdjain.ultron"
+            android:targetClass="com.akshatdjain.ultron.voice.VoiceActionActivity">
+            <parameter
+                android:name="android.intent.extra.DEVICE_NAME"
+                android:mimeType="text/*" />
+        </intent>
+    </capability>
+
+    <!-- Turn ambient light off -->
+    <capability android:name="actions.intent.TURN_OFF">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.akshatdjain.ultron"
+            android:targetClass="com.akshatdjain.ultron.voice.VoiceActionActivity">
+            <parameter
+                android:name="android.intent.extra.DEVICE_NAME"
+                android:mimeType="text/*" />
+        </intent>
+    </capability>
+
+    <!-- Set color by name (red, green, blue, white, orange, purple, pink) -->
+    <capability android:name="actions.intent.SET_COLOR">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.akshatdjain.ultron"
+            android:targetClass="com.akshatdjain.ultron.voice.VoiceActionActivity">
+            <parameter
+                android:name="android.intent.extra.DEVICE_NAME"
+                android:mimeType="text/*" />
+            <parameter
+                android:name="actions.fulfillment.fulfillment_intent.color"
+                android:mimeType="text/*" />
+        </intent>
+    </capability>
+
+    <!-- Set brightness -->
+    <capability android:name="actions.intent.SET_BRIGHTNESS">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="com.akshatdjain.ultron"
+            android:targetClass="com.akshatdjain.ultron.voice.VoiceActionActivity">
+            <parameter
+                android:name="android.intent.extra.DEVICE_NAME"
+                android:mimeType="text/*" />
+            <parameter
+                android:name="actions.fulfillment.fulfillment_intent.brightness"
+                android:mimeType="text/*" />
+        </intent>
+    </capability>
+
+</shortcuts>

@@ -1,0 +1,77 @@
+package com.akshatdjain.ultron
+
+import android.Manifest
+import android.os.Build
+import android.os.Bundle
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.akshatdjain.ultron.data.DeviceRepository
+import com.akshatdjain.ultron.ui.HomeScreen
+import com.akshatdjain.ultron.ui.HomeViewModel
+import com.akshatdjain.ultron.ui.HomeViewModelFactory
+import com.akshatdjain.ultron.ui.theme.UltronTheme
+
+class MainActivity : ComponentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContent {
+            UltronTheme {
+                val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(applicationContext))
+                val state by viewModel.uiState.collectAsState()
+
+                val permissionLauncher = rememberLauncherForActivityResult(
+                    ActivityResultContracts.RequestMultiplePermissions()
+                ) { permissions ->
+                    if (permissions.all { it.value }) {
+                        viewModel.onConnectClick()
+                    }
+                }
+
+                LaunchedEffect(Unit) {
+                    val savedDevice = DeviceRepository(applicationContext).getSavedDeviceAddress()
+                    if (savedDevice != null) {
+                        requestBlePermissionsAndScan(viewModel, permissionLauncher)
+                    }
+                }
+
+                HomeScreen(
+                    state = state,
+                    onColorPick = viewModel::onColorPick,
+                    onModeSelect = viewModel::onModeSelect,
+                    onBrightnessChange = viewModel::onBrightnessChange,
+                    onPowerToggle = viewModel::onPowerToggle,
+                    onConnectClick = {
+                        requestBlePermissionsAndScan(viewModel, permissionLauncher)
+                    }
+                )
+            }
+        }
+    }
+
+    private fun requestBlePermissionsAndScan(
+        viewModel: HomeViewModel,
+        launcher: androidx.activity.result.ActivityResultLauncher<Array<String>>
+    ) {
+        val permissions = when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                arrayOf(
+                    Manifest.permission.BLUETOOTH_SCAN,
+                    Manifest.permission.BLUETOOTH_CONNECT
+                )
+            }
+            else -> {
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            }
+        }
+        launcher.launch(permissions)
+    }
+}
