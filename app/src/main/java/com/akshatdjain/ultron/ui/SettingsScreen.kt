@@ -48,6 +48,7 @@ fun SettingsScreen(
     onWelcomeModeSelect: (Int) -> Unit,
     onWelcomeColorSelect: (Int) -> Unit,
     onWelcomeColorSync: () -> Unit,
+    onViewLogs: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -88,6 +89,27 @@ fun SettingsScreen(
                 onColorSelect = onWelcomeColorSelect,
                 onColorSync = onWelcomeColorSync
             )
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(MaterialTheme.colorScheme.surface)
+                    .clickable(onClick = onViewLogs)
+                    .padding(20.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Connection Logs",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Text(
+                    text = "View",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
         }
     }
 }

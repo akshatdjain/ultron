@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.akshatdjain.ultron.ble.BleScanResult
 import com.akshatdjain.ultron.ble.LightBleManager
 import com.akshatdjain.ultron.ble.LightProtocol
 import com.akshatdjain.ultron.data.DeviceRepository
@@ -20,6 +21,12 @@ class HomeViewModel(context: Context) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LightState())
     val uiState: StateFlow<LightState> = _uiState
+
+    private val _pickerVisible = MutableStateFlow(false)
+    val pickerVisible: StateFlow<Boolean> = _pickerVisible
+
+    val isScanning: StateFlow<Boolean> = bleManager.isScanning
+    val discoveredDevices: StateFlow<List<BleScanResult>> = bleManager.discoveredDevices
 
     init {
         viewModelScope.launch {
@@ -43,10 +50,25 @@ class HomeViewModel(context: Context) : ViewModel() {
     }
 
     fun onConnectClick() {
-        bleManager.scan { device ->
-            deviceRepository.saveDeviceAddress(device.address)
-            bleManager.connect(device)
-        }
+        _pickerVisible.value = true
+        bleManager.startScan()
+    }
+
+    fun onDeviceSelected(result: BleScanResult) {
+        _pickerVisible.value = false
+        bleManager.stopScan()
+        deviceRepository.saveDeviceAddress(result.address)
+        bleManager.connect(result.device)
+    }
+
+    fun onDismissPicker() {
+        _pickerVisible.value = false
+        bleManager.stopScan()
+    }
+
+    fun reconnectToSavedDevice(): Boolean {
+        val address = deviceRepository.getSavedDeviceAddress() ?: return false
+        return bleManager.connectByAddress(address)
     }
 
     fun onPowerToggle() {

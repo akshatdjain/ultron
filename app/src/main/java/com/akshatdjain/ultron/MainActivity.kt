@@ -20,8 +20,11 @@ import com.akshatdjain.ultron.data.DeviceRepository
 import com.akshatdjain.ultron.ui.HomeScreen
 import com.akshatdjain.ultron.ui.HomeViewModel
 import com.akshatdjain.ultron.ui.HomeViewModelFactory
+import com.akshatdjain.ultron.ui.LogsScreen
 import com.akshatdjain.ultron.ui.SettingsScreen
 import com.akshatdjain.ultron.ui.theme.UltronTheme
+
+private enum class Screen { Home, Settings, Logs }
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,70 +34,68 @@ class MainActivity : ComponentActivity() {
             UltronTheme {
                 val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(applicationContext))
                 val state by viewModel.uiState.collectAsState()
+                val pickerVisible by viewModel.pickerVisible.collectAsState()
+                val isScanning by viewModel.isScanning.collectAsState()
+                val discoveredDevices by viewModel.discoveredDevices.collectAsState()
 
+                var pendingBleAction by remember { mutableStateOf<(() -> Unit)?>(null) }
                 val permissionLauncher = rememberLauncherForActivityResult(
                     ActivityResultContracts.RequestMultiplePermissions()
                 ) { permissions ->
                     if (permissions.all { it.value }) {
-                        viewModel.onConnectClick()
+                        pendingBleAction?.invoke()
                     }
+                    pendingBleAction = null
+                }
+
+                fun requestBlePermissions(action: () -> Unit) {
+                    pendingBleAction = action
+                    val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+                    } else {
+                        arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION)
+                    }
+                    permissionLauncher.launch(permissions)
                 }
 
                 LaunchedEffect(Unit) {
                     val savedDevice = DeviceRepository(applicationContext).getSavedDeviceAddress()
                     if (savedDevice != null) {
-                        requestBlePermissionsAndScan(viewModel, permissionLauncher)
+                        requestBlePermissions { viewModel.reconnectToSavedDevice() }
                     }
                 }
 
-                var showSettings by remember { mutableStateOf(false) }
+                var screen by remember { mutableStateOf(Screen.Home) }
 
-                Crossfade(targetState = showSettings, label = "screenCrossfade") { onSettings ->
-                    if (onSettings) {
-                        SettingsScreen(
+                Crossfade(targetState = screen, label = "screenCrossfade") { current ->
+                    when (current) {
+                        Screen.Settings -> SettingsScreen(
                             state = state,
-                            onBack = { showSettings = false },
+                            onBack = { screen = Screen.Home },
                             onWelcomeToggle = viewModel::onWelcomeToggle,
                             onWelcomeModeSelect = viewModel::onWelcomeModeSelect,
                             onWelcomeColorSelect = viewModel::onWelcomeColorSelect,
-                            onWelcomeColorSync = viewModel::onWelcomeColorSync
+                            onWelcomeColorSync = viewModel::onWelcomeColorSync,
+                            onViewLogs = { screen = Screen.Logs }
                         )
-                    } else {
-                        HomeScreen(
+                        Screen.Logs -> LogsScreen(onBack = { screen = Screen.Settings })
+                        Screen.Home -> HomeScreen(
                             state = state,
                             onColorPick = viewModel::onColorPick,
                             onModeSelect = viewModel::onModeSelect,
                             onBrightnessChange = viewModel::onBrightnessChange,
                             onPowerToggle = viewModel::onPowerToggle,
-                            onConnectClick = {
-                                requestBlePermissionsAndScan(viewModel, permissionLauncher)
-                            },
-                            onSettingsClick = { showSettings = true }
+                            onConnectClick = { requestBlePermissions { viewModel.onConnectClick() } },
+                            onSettingsClick = { screen = Screen.Settings },
+                            pickerVisible = pickerVisible,
+                            isScanning = isScanning,
+                            discoveredDevices = discoveredDevices,
+                            onDeviceSelected = viewModel::onDeviceSelected,
+                            onDismissPicker = viewModel::onDismissPicker
                         )
                     }
                 }
             }
         }
-    }
-
-    private fun requestBlePermissionsAndScan(
-        viewModel: HomeViewModel,
-        launcher: androidx.activity.result.ActivityResultLauncher<Array<String>>
-    ) {
-        val permissions = when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                arrayOf(
-                    Manifest.permission.BLUETOOTH_SCAN,
-                    Manifest.permission.BLUETOOTH_CONNECT
-                )
-            }
-            else -> {
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            }
-        }
-        launcher.launch(permissions)
     }
 }

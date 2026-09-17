@@ -41,10 +41,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.akshatdjain.ultron.ble.BleScanResult
 import com.akshatdjain.ultron.data.LightState
 import com.akshatdjain.ultron.ui.components.BrightnessSlider
 import com.akshatdjain.ultron.ui.components.ColorWheel
 import com.akshatdjain.ultron.ui.components.ConnectionStatusBar
+import com.akshatdjain.ultron.ui.components.DevicePickerDialog
 import com.akshatdjain.ultron.ui.components.ModeGrid
 import android.graphics.Color as AndroidColor
 
@@ -63,6 +65,11 @@ fun HomeScreen(
     onPowerToggle: () -> Unit,
     onConnectClick: () -> Unit,
     onSettingsClick: () -> Unit,
+    pickerVisible: Boolean = false,
+    isScanning: Boolean = false,
+    discoveredDevices: List<BleScanResult> = emptyList(),
+    onDeviceSelected: (BleScanResult) -> Unit = {},
+    onDismissPicker: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val accentColor by animateColorAsState(
@@ -137,6 +144,15 @@ fun HomeScreen(
                 }
             }
         }
+    }
+
+    if (pickerVisible) {
+        DevicePickerDialog(
+            isScanning = isScanning,
+            devices = discoveredDevices,
+            onDeviceSelected = onDeviceSelected,
+            onDismiss = onDismissPicker
+        )
     }
 }
 
