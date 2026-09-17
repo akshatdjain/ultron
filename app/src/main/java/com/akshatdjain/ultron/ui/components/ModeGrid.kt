@@ -22,20 +22,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 private const val COLUMNS = 3
 
 @Composable
 fun ModeGrid(
-    currentMode: Int,
+    selectedCommand: String?,
     onModeSelect: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(20.dp)) {
-        ModeSection("Static Colors", ModeCategory.STATIC, currentMode, onModeSelect)
-        ModeSection("Flow Effects", ModeCategory.FLOW, currentMode, onModeSelect)
-        ModeSection("Extended Effects", ModeCategory.EXTENDED, currentMode, onModeSelect)
+        ModeSection("Static Colors", ModeCategory.STATIC, selectedCommand, onModeSelect)
+        ModeSection("Flow Effects", ModeCategory.FLOW, selectedCommand, onModeSelect)
+        ModeSection("Extended Effects", ModeCategory.EXTENDED, selectedCommand, onModeSelect)
     }
 }
 
@@ -43,7 +44,7 @@ fun ModeGrid(
 private fun ModeSection(
     title: String,
     category: ModeCategory,
-    currentMode: Int,
+    selectedCommand: String?,
     onModeSelect: (String) -> Unit
 ) {
     Column {
@@ -56,7 +57,7 @@ private fun ModeSection(
         LIGHT_MODES.filter { it.category == category }.chunked(COLUMNS).forEach { rowModes ->
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 rowModes.forEach { mode ->
-                    val isSelected = mode.command.substring(2).toInt(16) == currentMode
+                    val isSelected = mode.command == selectedCommand
                     ModeCard(
                         label = mode.label,
                         isSelected = isSelected,
@@ -91,7 +92,7 @@ private fun ModeCard(
 
     Box(
         modifier = modifier
-            .height(64.dp)
+            .height(72.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .clickable(onClick = onClick)
@@ -100,11 +101,12 @@ private fun ModeCard(
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.labelLarge,
+            style = MaterialTheme.typography.labelMedium,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             color = textColor,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }

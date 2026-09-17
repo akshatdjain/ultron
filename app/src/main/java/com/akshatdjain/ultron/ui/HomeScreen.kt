@@ -132,7 +132,7 @@ fun HomeScreen(
                         )
                         PresetSwatches(state.colorPrimary, onColorPick)
                         BrightnessSlider(state.brightness, accentColor, onBrightnessChange)
-                        ModeGrid(state.mode, onModeSelect)
+                        ModeGrid(state.selectedModeCommand, onModeSelect)
                     }
                 } else {
                     Text(

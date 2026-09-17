@@ -39,6 +39,7 @@ class HomeViewModel(context: Context) : ViewModel() {
                 LightStateParser.parseStatusFrame(frame)?.let { parsed ->
                     _uiState.update { current ->
                         parsed.copy(
+                            selectedModeCommand = current.selectedModeCommand,
                             welcomeEnabled = current.welcomeEnabled,
                             welcomeModeIndex = current.welcomeModeIndex,
                             welcomeColorIndex = current.welcomeColorIndex
@@ -93,6 +94,7 @@ class HomeViewModel(context: Context) : ViewModel() {
 
     fun onModeSelect(command: String) {
         bleManager.sendCommand(command)
+        _uiState.update { it.copy(selectedModeCommand = command) }
     }
 
     fun onWelcomeToggle(enabled: Boolean) {

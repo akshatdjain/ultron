@@ -127,6 +127,7 @@ class LightBleManager(private val context: Context) {
             for (frameString in frameStrings) {
                 val decoded = LightProtocol.decodeFrame(frameString)
                 if (decoded != null) {
+                    UltronLogger.d(TAG, "received <$frameString> decoded=${decoded.joinToString("") { "%02X".format(it) }}")
                     scope.launch {
                         _responseFrames.emit(decoded)
                     }
@@ -167,6 +168,7 @@ class LightBleManager(private val context: Context) {
             UltronLogger.e(TAG, "sendCommand($hexString) dropped: no write characteristic")
             return
         }
+        UltronLogger.d(TAG, "sendCommand <$hexString>")
         val frameBytes = LightProtocol.frameCommand(hexString)
         characteristic.value = frameBytes
         characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
