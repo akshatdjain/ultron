@@ -72,6 +72,24 @@ object LightProtocol {
 
         // Handshake/sync request
         const val HANDSHAKE = "0A01"
+
+        // "Welcome" feature: an automatic greeting light-show the device triggers
+        // itself off a physical door-sensor wire; these commands only configure it.
+        const val WELCOME_ON = "3001"
+        const val WELCOME_OFF = "3000"
+        const val WELCOME_MODE_BASE = "39" // + 00..05
+        const val WELCOME_COLOR_BASE = "38" // + 00..0E (15 preset palette)
+        const val WELCOME_COLOR_SYNC = "380F" // sync with main RGB color
+
+        val WELCOME_MODES = listOf(
+            "Center", "Door", "Door & Color", "Four-Door Sync 1", "Four-Door Sync 2", "Four-Door Sync 3"
+        )
+
+        val WELCOME_COLORS = listOf(
+            0xFFFF0000.toInt(), 0xFFFF6A00.toInt(), 0xFFFFFF00.toInt(), 0xFF00FF00.toInt(), 0xFF00FFFF.toInt(),
+            0xFF0000FF.toInt(), 0xFF7F00FF.toInt(), 0xFFFF0000.toInt(), 0xFFFF00FF.toInt(), 0xFFFFFFFF.toInt(),
+            0xFF00FF7F.toInt(), 0xFF7FFFD4.toInt(), 0xFFFF6666.toInt(), 0xFFCCFF66.toInt(), 0xFF6666FF.toInt()
+        )
     }
 
     // Response frame type constants

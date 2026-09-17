@@ -91,7 +91,7 @@ private fun ModeCard(
 
     Box(
         modifier = modifier
-            .height(56.dp)
+            .height(64.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(backgroundColor)
             .clickable(onClick = onClick)

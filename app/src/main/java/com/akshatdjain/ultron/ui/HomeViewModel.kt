@@ -29,7 +29,15 @@ class HomeViewModel(context: Context) : ViewModel() {
         }
         viewModelScope.launch {
             bleManager.responseFrames.collect { frame ->
-                LightStateParser.parseStatusFrame(frame)?.let { parsed -> _uiState.update { parsed } }
+                LightStateParser.parseStatusFrame(frame)?.let { parsed ->
+                    _uiState.update { current ->
+                        parsed.copy(
+                            welcomeEnabled = current.welcomeEnabled,
+                            welcomeModeIndex = current.welcomeModeIndex,
+                            welcomeColorIndex = current.welcomeColorIndex
+                        )
+                    }
+                }
             }
         }
     }
@@ -63,6 +71,26 @@ class HomeViewModel(context: Context) : ViewModel() {
 
     fun onModeSelect(command: String) {
         bleManager.sendCommand(command)
+    }
+
+    fun onWelcomeToggle(enabled: Boolean) {
+        bleManager.sendCommand(if (enabled) LightProtocol.Commands.WELCOME_ON else LightProtocol.Commands.WELCOME_OFF)
+        _uiState.update { it.copy(welcomeEnabled = enabled) }
+    }
+
+    fun onWelcomeModeSelect(index: Int) {
+        bleManager.sendCommand(LightProtocol.Commands.WELCOME_MODE_BASE + "%02X".format(index))
+        _uiState.update { it.copy(welcomeModeIndex = index) }
+    }
+
+    fun onWelcomeColorSelect(index: Int) {
+        bleManager.sendCommand(LightProtocol.Commands.WELCOME_COLOR_BASE + "%02X".format(index))
+        _uiState.update { it.copy(welcomeColorIndex = index) }
+    }
+
+    fun onWelcomeColorSync() {
+        bleManager.sendCommand(LightProtocol.Commands.WELCOME_COLOR_SYNC)
+        _uiState.update { it.copy(welcomeColorIndex = -1) }
     }
 }
 

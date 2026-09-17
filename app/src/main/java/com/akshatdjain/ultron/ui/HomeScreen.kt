@@ -18,9 +18,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -57,6 +62,7 @@ fun HomeScreen(
     onBrightnessChange: (Int) -> Unit,
     onPowerToggle: () -> Unit,
     onConnectClick: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val accentColor by animateColorAsState(
@@ -81,11 +87,29 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .safeDrawingPadding()
                 .verticalScroll(rememberScrollState())
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            ConnectionStatusBar(state.connectionState, onConnectClick)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                ConnectionStatusBar(
+                    connectionState = state.connectionState,
+                    onConnectClick = onConnectClick,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        imageVector = Icons.Filled.Settings,
+                        contentDescription = "Settings",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
             PowerRow(state.power, accentColor, onPowerToggle)
 
             Crossfade(targetState = state.power, label = "powerCrossfade") { isOn ->
@@ -143,14 +167,14 @@ private fun PowerRow(power: Boolean, accentColor: Color, onPowerToggle: () -> Un
 @Composable
 private fun PresetSwatches(currentColor: Int, onColorPick: (Int) -> Unit) {
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
         contentPadding = PaddingValues(horizontal = 2.dp)
     ) {
         items(PRESET_COLORS) { colorInt ->
             val isSelected = (colorInt and 0xFFFFFF) == (currentColor and 0xFFFFFF)
             Box(
                 modifier = Modifier
-                    .size(44.dp)
+                    .size(56.dp)
                     .clip(CircleShape)
                     .background(Color(colorInt))
                     .border(

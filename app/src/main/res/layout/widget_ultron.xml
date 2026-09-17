@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/widget_background"
+    android:padding="16dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/app_name"
+            android:textColor="#FFF2F2F7"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/widget_title"
+            android:layout_alignParentStart="true"
+            android:text="Tap to toggle"
+            android:textColor="#FFA6A6B3"
+            android:textSize="12sp" />
+
+        <ImageView
+            android:id="@+id/widget_power_button"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@drawable/widget_power_button"
+            android:padding="12dp"
+            android:src="@drawable/ic_power" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/widget_brightness_down"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/widget_round_button"
+            android:padding="8dp"
+            android:src="@drawable/ic_minus" />
+
+        <TextView
+            android:id="@+id/widget_brightness_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="50%"
+            android:textColor="#FFF2F2F7"
+            android:textSize="13sp" />
+
+        <ImageView
+            android:id="@+id/widget_brightness_up"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:background="@drawable/widget_round_button"
+            android:padding="8dp"
+            android:src="@drawable/ic_plus" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/widget_color_1"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_dot" />
+
+        <ImageView
+            android:id="@+id/widget_color_2"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_dot" />
+
+        <ImageView
+            android:id="@+id/widget_color_3"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_dot" />
+
+        <ImageView
+            android:id="@+id/widget_color_4"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_dot" />
+
+        <ImageView
+            android:id="@+id/widget_color_5"
+            android:layout_width="0dp"
+            android:layout_height="32dp"
+            android:layout_weight="1"
+            android:src="@drawable/ic_dot" />
+    </LinearLayout>
+
+</LinearLayout>

@@ -6,20 +6,27 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.akshatdjain.ultron.data.DeviceRepository
 import com.akshatdjain.ultron.ui.HomeScreen
 import com.akshatdjain.ultron.ui.HomeViewModel
 import com.akshatdjain.ultron.ui.HomeViewModelFactory
+import com.akshatdjain.ultron.ui.SettingsScreen
 import com.akshatdjain.ultron.ui.theme.UltronTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             UltronTheme {
                 val viewModel: HomeViewModel = viewModel(factory = HomeViewModelFactory(applicationContext))
@@ -40,16 +47,32 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                HomeScreen(
-                    state = state,
-                    onColorPick = viewModel::onColorPick,
-                    onModeSelect = viewModel::onModeSelect,
-                    onBrightnessChange = viewModel::onBrightnessChange,
-                    onPowerToggle = viewModel::onPowerToggle,
-                    onConnectClick = {
-                        requestBlePermissionsAndScan(viewModel, permissionLauncher)
+                var showSettings by remember { mutableStateOf(false) }
+
+                Crossfade(targetState = showSettings, label = "screenCrossfade") { onSettings ->
+                    if (onSettings) {
+                        SettingsScreen(
+                            state = state,
+                            onBack = { showSettings = false },
+                            onWelcomeToggle = viewModel::onWelcomeToggle,
+                            onWelcomeModeSelect = viewModel::onWelcomeModeSelect,
+                            onWelcomeColorSelect = viewModel::onWelcomeColorSelect,
+                            onWelcomeColorSync = viewModel::onWelcomeColorSync
+                        )
+                    } else {
+                        HomeScreen(
+                            state = state,
+                            onColorPick = viewModel::onColorPick,
+                            onModeSelect = viewModel::onModeSelect,
+                            onBrightnessChange = viewModel::onBrightnessChange,
+                            onPowerToggle = viewModel::onPowerToggle,
+                            onConnectClick = {
+                                requestBlePermissionsAndScan(viewModel, permissionLauncher)
+                            },
+                            onSettingsClick = { showSettings = true }
+                        )
                     }
-                )
+                }
             }
         }
     }

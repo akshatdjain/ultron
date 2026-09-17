@@ -21,6 +21,19 @@ android {
         }
     }
 
+    signingConfigs {
+        getByName("debug") {
+            // Committed, shared debug key so every build (local machine or CI) signs
+            // identically -- this is what lets `adb install -r` / a downloaded release
+            // APK update the app in place without wiping paired-device data. It has no
+            // production signing value; it's only ever used for the debug build type.
+            storeFile = file("../keystore/ultron-debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false

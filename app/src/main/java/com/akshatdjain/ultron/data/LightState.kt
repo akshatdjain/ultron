@@ -11,7 +11,11 @@ data class LightState(
     val brightness: Int = 50,
     val speed: Int = 0,
     val voiceLevel: Int = 0,
-    val connectionState: ConnectionState = ConnectionState.Disconnected
+    val connectionState: ConnectionState = ConnectionState.Disconnected,
+    // "Welcome" feature: device-side greeting light-show config, set once and rarely touched.
+    val welcomeEnabled: Boolean = false,
+    val welcomeModeIndex: Int = 0,
+    val welcomeColorIndex: Int = -1
 )
 
 object LightStateParser {
