@@ -2,10 +2,18 @@ package com.akshatdjain.ultron.car
 
 import androidx.car.app.CarContext
 import androidx.car.app.Screen
+import androidx.car.app.model.Action
 import androidx.car.app.model.ActionStrip
+import androidx.car.app.model.CarIcon
+import androidx.car.app.model.GridItem
+import androidx.car.app.model.GridTemplate
+import androidx.car.app.model.Header
+import androidx.car.app.model.ItemList
 import androidx.car.app.model.MessageTemplate
 import androidx.car.app.model.OnClickListener
 import androidx.car.app.model.Template
+import androidx.core.graphics.drawable.IconCompat
+import com.akshatdjain.ultron.R
 import com.akshatdjain.ultron.ble.ConnectionState
 import com.akshatdjain.ultron.ble.LightBleManager
 import com.akshatdjain.ultron.ble.LightProtocol
@@ -43,24 +51,31 @@ class MainCarScreen(carContext: CarContext) : Screen(carContext) {
             "Extended 3" to buildExtendedMode(0x1E)
         )
 
-        val builder = MessageTemplate.Builder(buildMenuText(colorCommands, modeCommands))
-            .setTitle("Ultron Controls")
+        val icon = CarIcon.Builder(
+            IconCompat.createWithResource(carContext, R.drawable.ic_dot)
+        ).build()
+
+        val listBuilder = ItemList.Builder()
+        for ((name, command) in colorCommands + modeCommands) {
+            listBuilder.addItem(
+                GridItem.Builder()
+                    .setTitle(name)
+                    .setImage(icon, GridItem.IMAGE_TYPE_ICON)
+                    .setOnClickListener(createCommandListener(command))
+                    .build()
+            )
+        }
+
+        return GridTemplate.Builder()
+            .setHeader(
+                Header.Builder()
+                    .setTitle("Ultron Controls")
+                    .setStartHeaderAction(Action.APP_ICON)
+                    .build()
+            )
+            .setSingleList(listBuilder.build())
             .setActionStrip(buildActionStrip())
-
-        return builder.build()
-    }
-
-    private fun buildMenuText(
-        colors: List<Pair<String, String>>,
-        modes: List<Pair<String, String>>
-    ): String {
-        val colorText = colors.mapIndexed { i, (name, _) ->
-            "${i + 1}. $name"
-        }.joinToString("\n")
-        val modeText = modes.mapIndexed { i, (name, _) ->
-            "${colors.size + i + 1}. $name"
-        }.joinToString("\n")
-        return "Colors:\n$colorText\n\nModes:\n$modeText"
+            .build()
     }
 
 
@@ -111,7 +126,7 @@ class MainCarScreen(carContext: CarContext) : Screen(carContext) {
     private fun createCommandListener(command: String): OnClickListener {
         return OnClickListener {
             bleManager.sendCommand(command)
-            screenManager.pop()
+            invalidate()
         }
     }
 

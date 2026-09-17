@@ -24,7 +24,7 @@ private val UltronDarkColorScheme = darkColorScheme(
 
 @Composable
 fun UltronTheme(
-    dynamicColor: Boolean = false,
+    dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
